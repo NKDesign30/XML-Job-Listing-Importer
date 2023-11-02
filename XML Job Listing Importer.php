@@ -13,11 +13,30 @@ function xmljli_add_admin_menu()
 {
   add_menu_page('XML Job Listing Upload', 'XML Job Listing Upload', 'manage_options', 'xml-job-listing-upload', 'xmljli_upload_page', 'dashicons-upload', 6);
 }
-
 // Upload-Seite rendern
 function xmljli_upload_page()
 {
-  include(plugin_dir_path(__FILE__) . 'includes/xml-upload-handler.php');
+?>
+  <div class="wrap">
+    <h1>XML Job Listing Importer</h1>
+    <form method="post" enctype="multipart/form-data">
+      <?php wp_nonce_field('xmljli_upload_nonce', '_wpnonce'); ?>
+      <input type="file" name="xml_file" accept=".xml" required>
+      <input type="submit" name="import_xml" value="Importieren" class="button button-primary">
+    </form>
+  </div>
+<?php
+
+  // Überprüfen, ob das Formular abgesendet wurde
+  if (isset($_POST['import_xml']) && check_admin_referer('xmljli_upload_nonce', '_wpnonce')) {
+    $file = $_FILES['xml_file'];
+    if ($file['type'] === 'text/xml' || $file['type'] === 'application/xml') {
+      // Hier würden Sie den Code zum Verarbeiten der XML-Datei einfügen
+      xmljli_process_xml($file['tmp_name']);
+    } else {
+      echo '<div class="error"><p>Bitte laden Sie eine gültige XML-Datei hoch.</p></div>';
+    }
+  }
 }
 
 // Enqueue Admin CSS
