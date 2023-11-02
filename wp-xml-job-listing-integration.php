@@ -27,6 +27,7 @@ function wp_xml_jli_enqueue_admin_styles()
 }
 
 // Shortcode für das Upload-Formular
+add_shortcode('wp_xml_jli_upload_form', 'wp_xml_jli_upload_form_shortcode');
 function wp_xml_jli_upload_form_shortcode()
 {
   if (!is_user_logged_in()) {
@@ -45,7 +46,6 @@ function wp_xml_jli_upload_form_shortcode()
 <?php
   return ob_get_clean();
 }
-add_shortcode('wp_xml_jli_upload_form', 'wp_xml_jli_upload_form_shortcode');
 
 // Action-Hook für das Verarbeiten des Uploads
 add_action('admin_post_xml_job_listing_upload', 'wp_xml_jli_handle_upload');
@@ -53,3 +53,4 @@ function wp_xml_jli_handle_upload()
 {
   include(plugin_dir_path(__FILE__) . 'includes/xml-upload-handler.php');
 }
+?>

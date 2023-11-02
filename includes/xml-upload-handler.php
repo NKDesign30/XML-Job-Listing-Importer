@@ -1,33 +1,28 @@
 <?php
 // Sicherstellen, dass diese Datei nicht direkt aufgerufen wird
 if (!defined('ABSPATH')) {
-  exit;
+    exit;
 }
 
 // Überprüfen, ob das Formular abgesendet wurde
 if (isset($_POST['submit']) && isset($_FILES['xml_job_listing']) && wp_verify_nonce($_POST['_wpnonce'], 'wp_xml_jli_upload_nonce')) {
-  require_once(plugin_dir_path(__FILE__) . 'post-creator.php');
-  $uploadedFile = $_FILES['xml_job_listing'];
+    require_once(plugin_dir_path(__FILE__) . 'xml-post-creator.php');
+    $uploadedFile = $_FILES['xml_job_listing'];
 
-  // Überprüfen, ob es sich um eine XML-Datei handelt
-  if ($uploadedFile['type'] == 'text/xml' || $uploadedFile['type'] == 'application/xml') {
-    $xml_content = file_get_contents($uploadedFile['tmp_name']);
-    $xml = simplexml_load_string($xml_content);
-    if ($xml) {
-      // Gehe durch jedes <job>-Element in der XML-Datei
-      foreach ($xml->job as $job) {
-        // Erstelle einen neuen Beitrag für jedes Job-Listing
-        wp_xml_jli_create_post($job);
-      }
-      // Weiterleitung zum 'job_listing'-Beitrags-Typ im Admin-Bereich
-      wp_redirect(admin_url('edit.php?post_type=job_listing'));
-      exit;
+    // Überprüfen, ob es sich um eine XML-Datei handelt
+    if ($uploadedFile['type'] == 'text/xml' || $uploadedFile['type'] == 'application/xml') {
+        $xml_content = file_get_contents($uploadedFile['tmp_name']);
+        $xml = simplexml_load_string($xml_content);
+        if ($xml) {
+            foreach ($xml->job as $job) {
+                wp_xml_jli_create_post($job);
+            }
+            wp_redirect(admin_url('edit.php?post_type=job_listing'));
+            exit;
+        } else {
+            wp_die('Fehler beim Parsen der XML-Datei.');
+        }
     } else {
-      // Fehlermeldung, wenn die XML-Datei nicht geparst werden kann
-      wp_die('Fehler beim Parsen der XML-Datei.');
+        wp_die('Bitte laden Sie eine gültige XML-Datei hoch.');
     }
-  } else {
-    // Fehlermeldung, wenn die hochgeladene Datei keine XML-Datei ist
-    wp_die('Bitte laden Sie eine gültige XML-Datei hoch.');
-  }
 }
