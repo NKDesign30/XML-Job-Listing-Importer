@@ -14,15 +14,20 @@ if (isset($_POST['submit']) && isset($_FILES['xml_job_listing']) && wp_verify_no
     $xml_content = file_get_contents($uploadedFile['tmp_name']);
     $xml = simplexml_load_string($xml_content);
     if ($xml) {
+      // Gehe durch jedes <job>-Element in der XML-Datei
       foreach ($xml->job as $job) {
+        // Erstelle einen neuen Beitrag für jedes Job-Listing
         wp_xml_jli_create_post($job);
       }
+      // Weiterleitung zum 'job_listing'-Beitrags-Typ im Admin-Bereich
       wp_redirect(admin_url('edit.php?post_type=job_listing'));
       exit;
     } else {
+      // Fehlermeldung, wenn die XML-Datei nicht geparst werden kann
       wp_die('Fehler beim Parsen der XML-Datei.');
     }
   } else {
+    // Fehlermeldung, wenn die hochgeladene Datei keine XML-Datei ist
     wp_die('Bitte laden Sie eine gültige XML-Datei hoch.');
   }
 }
